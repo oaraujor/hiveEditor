@@ -1,10 +1,14 @@
-#include "utils.h"
+#include <ncurses.h>
+#include <stdlib.h>
+#include <string.h>
 
 int main(){
 
-	const char * greeting = "Hello this my new project called hiveEditor\n";
-
-	new_project(greeting);
+	initscr();
+	printw("hello with ncurses test\n");
+	refresh();
+	getch();
+	endwin();
 
 	return 0;
 }

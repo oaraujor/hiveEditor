@@ -1,7 +1,7 @@
 # Compiler and flags
 CC = gcc
 CFLAGS = -Wall -Wextra -g -Iinclude
-#LDFLAGS = -lncurses
+LDFLAGS = -lncurses
 
 # Directories
 SRC_DIR = src
