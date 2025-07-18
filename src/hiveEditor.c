@@ -16,6 +16,7 @@ int main()
 
 	int win_height = LINES - 2;
 	int win_width = COLS - 2;
+
 	WINDOW *edit_win = newwin(win_height, win_width, 1, 1);
 	
 	char buffer[BUF_LINES][BUF_COLS] = {{0}};
@@ -24,28 +25,37 @@ int main()
 	int running = true;
 	int i, ch;
 
+	//draw border
+	box(stdscr, 0, 0);
+
 	while (running)
 	{
-		//werase(edit_win);
-
-		clear();
-		box(stdscr, 0, 0);
-		werase(edit_win);
-		mvprintw(LINES-1, 2, " hiveEditor | Ctrl+Q to quit | Cursor: (%d,%d) ", cur_line + 1, cur_col + 1);
-
-
-		i = 0;
-		for (i = 0; i < BUF_LINES; i++)
-		{
-			mvwaddnstr(edit_win, i, 0, buffer[i], line_len[i]);
-		}
-
+		//statusbar
+		mvprintw(LINES - 1, 2, " hiveEditor | Ctrl+Q to quit | Cursor: (%d,%d) ", cur_line + 1, cur_col + 1);
+		
 		wmove(edit_win, cur_line, cur_col);
 		wrefresh(edit_win);
 		refresh();
 
-		ch = wgetch(edit_win);
+		//draw in window
+		werase(edit_win);
 
+		i = 0;
+		for (i = 0; i < BUF_LINES; i++)
+		{
+			if(line_len[i] > 0)
+			{
+				//print lines into window
+				mvwaddnstr(edit_win, i, 0, buffer[i], line_len[i]);
+			}
+		}
+
+		//wmove(edit_win, cur_line, cur_col);
+		//wrefresh(edit_win);
+		//refresh();
+		
+		// USER INPUT HANDLING
+		ch = wgetch(edit_win);
 		switch (ch)
 		{
 			case 17: // Ctrl+Q (ASCII 17) to quit
@@ -64,7 +74,7 @@ int main()
 				break;
 
 			case KEY_DOWN: // Move cursor down a line if not at the bottom
-				if (cur_line < BUF_LINES-1)
+				if (cur_line < BUF_LINES - 1)
 				{
 					cur_line++;
 					if (cur_col > line_len[cur_line])
