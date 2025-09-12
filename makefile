@@ -5,11 +5,13 @@ LDFLAGS = -lncurses
 SRC_DIR = src
 BUILD_DIR = build
 INC_DIR = include
+TEST_DIR = test_main
 
 SRCS = $(wildcard $(SRC_DIR)/*.c)
 OBJS = $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SRCS))
 
 TARGET = $(BUILD_DIR)/hiveEditor
+TARGET_TEST = $(BUILD_DIR)/hiveEditor_test
 
 all: $(TARGET)
 
@@ -21,9 +23,18 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -rf $(BUILD_DIR)/*
+	$(RM) -rf $(BUILD_DIR)/*
+	clear
 
 run: all
 	$(TARGET)
 
-.PHONY: all clean run
+safety:
+	valgrind --leak-check=full --track-origins=yes --show-leak-kinds=all $(TARGET)
+
+test:
+	$(CC) $(CFLAGS) $(TEST_DIR)/test_main.c -o $(TARGET_TEST)
+
+testRun:
+	$(TARGET_TEST)
+.PHONY: all clean run safety test testRun
