@@ -13,7 +13,7 @@ SRCS = $(wildcard $(SRC_DIR)/*.c)
 OBJS = $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SRCS))
 
 TARGET = $(BUILD_DIR)/hiveEditor
-TARGET_TEST = $(BUILD_DIR)/hiveEditor_test
+TARGET_TEST = $(BUILD_DIR)/main
 
 all: $(TARGET)
 
@@ -35,10 +35,10 @@ safety:
 	valgrind --leak-check=full --track-origins=yes --show-leak-kinds=all $(TARGET) 
 
 test:
-	$(CC) $(CFLAGS) $(TEST_DIR)/test_main.c -o $(TARGET_TEST)
+	$(CC) $(CFLAGS) $(TEST_DIR)/main.c -o $(TARGET_TEST)
 
 run_test:
-	$(TARGET_TEST) $(ARGS)
+	$(TARGET_TEST)
 
 safety_test:
 	valgrind --leak-check=full --track-origins=yes --show-leak-kinds=all -s $(TARGET_TEST) $(ARGS)
