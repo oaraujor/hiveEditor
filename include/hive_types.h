@@ -11,20 +11,19 @@ typedef struct _node_char {
     struct _node_char   *prev_char_n; //prev character in line
 }hv_CHAR;
 
+typedef hv_CHAR hv_CURSOR; 
+
 typedef struct _editor_file {
-    char*       name_file;
+    const char*       name_file;
     size_t      num_char;
     hv_CHAR*    contents_HEAD;
-    hv_CHAR*    curr_char_cursor;
+    hv_CURSOR*  curr_char_cursor;
 }hv_FILE;
 
-typedef hv_CHAR hv_cursor; 
-
-
-void hv_free_contents(hv_CHAR *);
-void hv_free_file(hv_FILE *);
-hv_CHAR * hv_create_new_char();
-hv_FILE * hv_create_new_file();
+void        hv_free_contents(hv_CHAR *);
+void        hv_free_file(hv_FILE *);
+hv_CHAR*    hv_create_new_char();
+hv_FILE*    hv_create_new_file();
 
 /*
     hv_CHAR * hv_create_new_char()
@@ -109,4 +108,3 @@ hv_free_file(hv_FILE *hv_file) {
 }
 
 #endif
-

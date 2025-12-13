@@ -6,12 +6,13 @@
 //#include <termios.h>
 //#include <unistd.h>
 
-void hv_handle_usrIn(char, hv_FILE *, int, int, bool *);
+void hv_handle_usrIn(char, hv_FILE *, int *, int *, bool *);
 void hv_add_char(hv_FILE *, char);
-void print_file(hv_FILE *);
-//int hv_getch();
+void hv_rm_char(hv_FILE *);
+void hv_save_file(hv_FILE *);
 
-void hv_handle_usrIn(char ch, hv_FILE * file, int curr_col, int curr_line, bool * isRunning) {
+void
+hv_handle_usrIn(char ch, hv_FILE * file, int * curr_col, int * curr_line, bool *isRunning) {
 
     switch (ch) {
 
@@ -21,30 +22,32 @@ void hv_handle_usrIn(char ch, hv_FILE * file, int curr_col, int curr_line, bool 
 
         case KEY_UP: 
             // Move cursor up a line if not at the top
-            if (curr_line > 0) {
-                curr_line--;
+            if (*curr_line > 0) {
+                (*curr_line)--;
             }
             break;
 
         case KEY_DOWN:
             // Move cursor down a line if not at the bottom
-            curr_line++;
+            (*curr_line)++;
             break;
 
         case KEY_LEFT:
-            curr_col--;
+            (*curr_col)--;
             file->curr_char_cursor = file->curr_char_cursor->prev_char_n;
             break;
             
         case KEY_RIGHT:
             // Move cursor right if not at end of buffer
-            if (curr_col > 0) {
-                curr_col++;
+            if (*curr_col > 0) {
+                (*curr_col)++;
             }
             file->curr_char_cursor = file->curr_char_cursor->next_char_n;
             break;
         
         case KEY_BACKSPACE:
+            /*TODO: handle backspace for removing characters from the file*/
+            break;
         case 127:
         case 8:
             // Handle backspace: remove character before cursor
@@ -53,19 +56,20 @@ void hv_handle_usrIn(char ch, hv_FILE * file, int curr_col, int curr_line, bool 
 
         case '\n':
             hv_add_char(file, '\n');
-            curr_line++;
-            curr_col = 1;
+            (*curr_line)++;
+            *(curr_col) = 1;
             break;
             
         default:    
             hv_add_char(file, ch);
-            curr_col++;
+            (*curr_col)++;
             break;
     }
 }
 
 
-void hv_add_char(hv_FILE* file, char c) {
+void
+hv_add_char(hv_FILE* file, char c) {
     hv_CHAR *newChar = NULL;
     hv_CHAR *t = NULL, *curr = NULL;
 
@@ -101,33 +105,52 @@ void hv_add_char(hv_FILE* file, char c) {
         file->num_char++;
     }
 }
+
 /*
-int hv_getch() {
-    struct termios oldt, newt;
-    int ch;
+   hv_rm_char(hv_FILE *file)
+   Removes the char that the cursor is pointing to.
 
-    tcgetattr(STDIN_FILENO, &oldt);
-    newt = oldt;
-    newt.c_lflag &= ~(ICANON | ECHO);
-    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-    ch = getchar();
-    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+   Return:  NULL if failed to remove
+void
+hv_rm_char(hv_FILE * file) {
+    hv_FILE * temp_file = NULL;
+    hv_CURSOR * temp_file_cur = NULL;
+    hv_CHAR *tmp_prev = NULL, *temp_next = NULL;
 
-    return ch;
-
-}
-*/
-
-void print_file(hv_FILE *file) {
-
-    hv_cursor *currChar;
+    temp_file = file;
+    temp_file_cur = file-curr_char_cursor;
     
-    currChar = file->contents_HEAD;
 
-    printf("file: %s | chars: %zu\n", file->name_file, file->num_char);
-    while (currChar not_eq NULL) {
-        putchar(currChar->c);
-        currChar = currChar->next_char_n;
-    }
+
+
+
+
+
+
+
+
+
 }
+ */
+
+void
+hv_save_file(hv_FILE * file) {
+
+    FILE *temp_arch = NULL;
+    hv_CHAR *temp_char = NULL;
+    
+    temp_arch = fopen(file->name_file, "w");
+
+    temp_char = file->contents_HEAD;
+
+    while(temp_char != NULL) {
+        fputc(temp_char->c, temp_arch);
+        temp_char = temp_char->next_char_n;
+    }
+
+    fclose(temp_arch);
+
+}
+
+
 #endif
