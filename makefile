@@ -1,45 +1,43 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -g -Iinclude
 LDFLAGS = -lncurses
-
-ARGS = test_file.txt
-
 SRC_DIR = src
 BUILD_DIR = build
 INC_DIR = include
-TEST_DIR = test_main
-
+LOG_DIR = logs
+OUT_TXT = out_txt
+LOG_FILE = $(LOG_DIR)/hive_mem_logs.txt
+TARGET = $(BUILD_DIR)/hiveEditor
 SRCS = $(wildcard $(SRC_DIR)/*.c)
 OBJS = $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SRCS))
 
-TARGET = $(BUILD_DIR)/hiveEditor
-TARGET_TEST = $(BUILD_DIR)/main
-
-all: $(TARGET)
-
 $(TARGET): $(OBJS)
+	@echo "LINKING!\n"
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
+	@echo "CREATING .O FILES\n"
 	@mkdir -p $(BUILD_DIR)
+	@mkdir -p $(LOG_DIR)
+	@mkdir -p $(OUT_TXT)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
+	@echo "CLEANING BIN-LOGS-TXT-TEST"
 	$(RM) -rf $(BUILD_DIR)/*
-	clear
+	$(RM) -rf $(LOG_DIR)/*
+	$(RM) -rf $(OUT_TXT)/
 
-run: all
+run:
 	$(TARGET)
+	@wc $(OUT_TXT)/*.txt
 
-safety:
-	valgrind --leak-check=full --track-origins=yes --show-leak-kinds=all $(TARGET) 
+memtest:
+	@echo "CHECKING FOR MEMORY LEAKS | $(TARGET)\n"
+	valgrind --leak-check=full --track-origins=yes --show-leak-kinds=all --vgdb=full --log-file=$(LOG_FILE) -s $(TARGET)
+	@echo "\nLOGS SAVED | $(LOG_FILE)"
 
-test:
-	$(CC) $(CFLAGS) $(TEST_DIR)/main.c -o $(TARGET_TEST)
+show-vlogs:
+	@cat $(LOG_FILE)
 
-run_test:
-	$(TARGET_TEST)
-
-safety_test:
-	valgrind --leak-check=full --track-origins=yes --show-leak-kinds=all -s $(TARGET_TEST) $(ARGS)
-.PHONY: all clean run safety test run_test safety_test
+.PHONY: clean run memtest show-vlogs
